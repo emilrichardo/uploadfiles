@@ -6,24 +6,40 @@ import { Progress } from "@nextui-org/progress"
 import DocumentUploader from "@/components/document-uploader"
 import FieldDefinitionForm from "@/components/field-definition-form"
 import ReviewAndSubmit from "@/components/review-and-submit"
+import DocumentTypeSelector from "@/components/document-type-selector"
 import type { DocumentData } from "@/lib/types"
 
 export default function Home() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(0) // 0: type selection, 1: upload, 2: fields, 3: review
   const [documentData, setDocumentData] = useState<DocumentData>({
     file: null,
     fileName: "",
     fileType: "",
     fields: [],
     apiEndpoint: "https://n8n-api-endpoint.example/webhook",
+    category: "",
   })
 
-  const handleDocumentUpload = (file: File) => {
+  const handleTypeSelection = (type: "new" | "template", templateData?: any) => {
+    if (type === "template" && templateData) {
+      setDocumentData({
+        ...documentData,
+        fields: templateData.fields,
+        category: templateData.category,
+      })
+      setStep(1) // Go directly to upload
+    } else {
+      setStep(1) // Go to upload for new document
+    }
+  }
+
+  const handleDocumentUpload = (file: File, category: string) => {
     setDocumentData({
       ...documentData,
       file,
       fileName: file.name,
       fileType: file.type,
+      category,
     })
     setStep(2)
   }
@@ -50,25 +66,75 @@ export default function Home() {
       fileType: "",
       fields: [],
       apiEndpoint: "https://n8n-api-endpoint.example/webhook",
+      category: "",
     })
-    setStep(1)
+    setStep(0)
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold text-center">Document Reader</h1>
-          <Progress aria-label="Progress" value={(step / 3) * 100} className="max-w-md mx-auto" color="primary" />
-          <div className="flex justify-between w-full max-w-md mx-auto text-sm">
-            <span className={step >= 1 ? "text-primary" : ""}>Upload</span>
-            <span className={step >= 2 ? "text-primary" : ""}>Define Fields</span>
-            <span className={step >= 3 ? "text-primary" : ""}>Review & Submit</span>
+    <div className="container mx-auto px-8 py-12">
+      <Card className="max-w-5xl mx-auto card-elevated bg-white/70 backdrop-blur-sm">
+        <CardHeader className="flex flex-col gap-6 p-10">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
+              Document Reader
+            </h1>
+            <p className="text-gray-600 text-lg font-light">
+              Extrae información de documentos con inteligencia artificial
+            </p>
           </div>
+
+          {step > 0 && (
+            <div className="space-y-6">
+              <Progress
+                aria-label="Progress"
+                value={(step / 3) * 100}
+                className="max-w-lg mx-auto"
+                color="success"
+                size="lg"
+                classNames={{
+                  track: "bg-green-100",
+                  indicator: "gradient-green",
+                }}
+              />
+              <div className="flex justify-between w-full max-w-lg mx-auto text-sm font-medium">
+                <span className={`transition-colors ${step >= 1 ? "text-green-600" : "text-gray-400"}`}>
+                  Subir Documento
+                </span>
+                <span className={`transition-colors ${step >= 2 ? "text-green-600" : "text-gray-400"}`}>
+                  Definir Campos
+                </span>
+                <span className={`transition-colors ${step >= 3 ? "text-green-600" : "text-gray-400"}`}>
+                  Revisar y Enviar
+                </span>
+              </div>
+            </div>
+          )}
+
+          {step === 0 && (
+            <div className="text-center space-y-2">
+              <p className="text-gray-500 text-lg">Elige cómo quieres procesar tu documento</p>
+              <div className="w-24 h-1 gradient-green mx-auto rounded-full"></div>
+            </div>
+          )}
         </CardHeader>
-        <CardBody>
-          {step === 1 && <DocumentUploader onUpload={handleDocumentUpload} />}
-          {step === 2 && <FieldDefinitionForm onSubmit={handleFieldsUpdate} onBack={() => setStep(1)} />}
+
+        <CardBody className="p-10 pt-0">
+          {step === 0 && <DocumentTypeSelector onSelect={handleTypeSelection} />}
+          {step === 1 && (
+            <DocumentUploader
+              onUpload={handleDocumentUpload}
+              onBack={() => setStep(0)}
+              selectedCategory={documentData.category}
+            />
+          )}
+          {step === 2 && (
+            <FieldDefinitionForm
+              onSubmit={handleFieldsUpdate}
+              onBack={() => setStep(1)}
+              initialFields={documentData.fields}
+            />
+          )}
           {step === 3 && (
             <ReviewAndSubmit
               documentData={documentData}

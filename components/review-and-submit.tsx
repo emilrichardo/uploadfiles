@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import { Button } from "@nextui-org/button"
-import { Card, CardBody, CardHeader } from "@nextui-org/card"
+import { Card, CardBody } from "@nextui-org/card"
 import { Input } from "@nextui-org/input"
 import { Divider } from "@nextui-org/divider"
 import { Chip } from "@nextui-org/chip"
-import { ArrowLeft, Send, Check, AlertCircle, File, ChevronDown, ChevronUp } from "lucide-react"
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal"
+import { ArrowLeft, Send, Check, AlertCircle, File, ChevronDown, ChevronUp, Save, Sparkles } from "lucide-react"
+import { saveTemplate, getCategories } from "@/lib/storage"
 import type { DocumentData } from "@/lib/types"
 
 interface ReviewAndSubmitProps {
@@ -21,6 +23,11 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState("")
   const [expandedFields, setExpandedFields] = useState<Record<string, boolean>>({})
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false)
+  const [templateName, setTemplateName] = useState("")
+  const [templateDescription, setTemplateDescription] = useState("")
+
+  const categories = getCategories()
 
   const toggleField = (fieldId: string) => {
     setExpandedFields((prev) => ({
@@ -42,6 +49,7 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
 
       // Add fields as JSON
       formData.append("fields", JSON.stringify(documentData.fields))
+      formData.append("category", documentData.category || "")
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -64,131 +72,281 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
     }
   }
 
+  const handleSaveTemplate = () => {
+    if (!templateName.trim()) return
+
+    const categoryName = categories.find((cat) => cat.id === documentData.category)?.name || documentData.category
+
+    saveTemplate({
+      name: templateName,
+      category: documentData.category || "other",
+      fields: documentData.fields,
+      description: templateDescription,
+    })
+
+    setShowSaveTemplate(false)
+    setTemplateName("")
+    setTemplateDescription("")
+  }
+
+  const getCategoryName = () => {
+    const category = categories.find((cat) => cat.id === documentData.category)
+    return category?.name || documentData.category
+  }
+
   if (isSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <div className="rounded-full bg-green-900/20 p-3 mb-4 border border-green-800">
-          <Check className="h-8 w-8 text-green-400" />
+      <div className="flex flex-col items-center justify-center py-16 space-y-8">
+        <div className="relative">
+          <div className="rounded-full gradient-green-light p-6 shadow-xl">
+            <Check className="h-12 w-12 text-green-600" />
+          </div>
+          <div className="absolute -top-2 -right-2">
+            <Sparkles className="h-8 w-8 text-green-400" />
+          </div>
         </div>
-        <h2 className="text-xl font-bold mb-2 text-white">Submission Successful!</h2>
-        <p className="text-gray-300 text-center mb-6">
-          Your document and field definitions have been successfully sent to the API.
-        </p>
-        <Button color="primary" onClick={onReset}>
-          Process Another Document
-        </Button>
+
+        <div className="text-center space-y-4">
+          <h2 className="text-3xl font-bold text-gray-800">¡Procesamiento Exitoso!</h2>
+          <p className="text-gray-600 text-lg font-light max-w-lg mx-auto leading-relaxed">
+            Tu documento y configuración de campos han sido enviados exitosamente a la API.
+          </p>
+        </div>
+
+        <div className="flex gap-4">
+          <Button
+            color="secondary"
+            variant="flat"
+            startContent={<Save className="h-5 w-5" />}
+            onClick={() => setShowSaveTemplate(true)}
+            size="lg"
+            className="bg-gray-100 text-gray-700 hover:bg-gray-200 font-medium px-6"
+          >
+            Guardar como Plantilla
+          </Button>
+          <Button color="success" onClick={onReset} size="lg" className="btn-primary-gradient font-medium px-8">
+            Procesar Otro Documento
+          </Button>
+        </div>
+
+        {/* Save Template Modal */}
+        <Modal isOpen={showSaveTemplate} onClose={() => setShowSaveTemplate(false)} size="lg">
+          <ModalContent className="m-6">
+            <ModalHeader className="p-6 pb-2">
+              <h3 className="text-xl font-semibold text-gray-800">Guardar Plantilla</h3>
+            </ModalHeader>
+            <ModalBody className="p-6 space-y-6">
+              <Input
+                label="Nombre de la Plantilla"
+                placeholder="ej: Facturas de Servicios"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                isRequired
+                size="lg"
+                classNames={{
+                  input: "text-base",
+                  label: "text-base font-medium text-gray-700",
+                  inputWrapper: "input-enhanced h-14",
+                }}
+              />
+              <Input
+                label="Descripción (opcional)"
+                placeholder="Describe para qué tipo de documentos es esta plantilla"
+                value={templateDescription}
+                onChange={(e) => setTemplateDescription(e.target.value)}
+                size="lg"
+                classNames={{
+                  input: "text-base",
+                  label: "text-base font-medium text-gray-700",
+                  inputWrapper: "input-enhanced h-14",
+                }}
+              />
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
+                <p className="text-green-800 font-medium">
+                  <strong>Categoría:</strong> {getCategoryName()}
+                </p>
+                <p className="text-green-800 font-medium">
+                  <strong>Campos:</strong> {documentData.fields.length}
+                </p>
+              </div>
+            </ModalBody>
+            <ModalFooter className="p-6 pt-2">
+              <Button
+                variant="flat"
+                onClick={() => setShowSaveTemplate(false)}
+                size="lg"
+                className="bg-gray-100 text-gray-700 hover:bg-gray-200"
+              >
+                Cancelar
+              </Button>
+              <Button
+                color="primary"
+                onClick={handleSaveTemplate}
+                isDisabled={!templateName.trim()}
+                size="lg"
+                className="btn-primary-gradient font-medium"
+              >
+                Guardar Plantilla
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold">Review and Submit</h2>
+    <div className="flex flex-col gap-8">
+      <div className="flex items-center gap-4">
+        <Button
+          variant="flat"
+          startContent={<ArrowLeft className="h-5 w-5" />}
+          onClick={onBack}
+          size="lg"
+          className="bg-gray-100 text-gray-700 hover:bg-gray-200"
+        >
+          Volver
+        </Button>
+        <div className="space-y-1">
+          <h2 className="text-2xl font-semibold text-gray-800">Revisar y Enviar</h2>
+          <p className="text-gray-600 font-light">Verifica la información antes de procesar</p>
+        </div>
+      </div>
 
-      <Card className="mb-4">
-        <CardBody>
-          <h3 className="text-md font-medium mb-2">Document</h3>
-          <Divider className="my-2" />
-          <div className="flex items-center gap-2 mb-4">
-            <File className="h-5 w-5 text-primary" />
-            <span>{documentData.fileName}</span>
-            <Chip size="sm" variant="flat">
-              {documentData.fileType}
-            </Chip>
+      <Card className="card-elevated bg-white/80 backdrop-blur-sm">
+        <CardBody className="p-8 space-y-6">
+          <h3 className="text-lg font-semibold text-gray-800">Documento</h3>
+          <Divider className="bg-gray-200" />
+          <div className="flex items-center gap-4">
+            <div className="rounded-xl gradient-green-light p-3">
+              <File className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="space-y-1">
+              <span className="font-medium text-gray-800">{documentData.fileName}</span>
+              <div className="flex items-center gap-3">
+                <Chip size="md" variant="flat" className="bg-gray-100 text-gray-700">
+                  {documentData.fileType}
+                </Chip>
+                {documentData.category && (
+                  <Chip size="md" variant="flat" className="bg-green-100 text-green-700">
+                    {getCategoryName()}
+                  </Chip>
+                )}
+              </div>
+            </div>
           </div>
         </CardBody>
       </Card>
 
-      <Card className="mb-4">
-        <CardBody>
-          <h3 className="text-md font-medium mb-2">Fields to Extract ({documentData.fields.length})</h3>
-          <Divider className="my-2" />
+      <Card className="card-elevated bg-white/80 backdrop-blur-sm">
+        <CardBody className="p-8 space-y-6">
+          <h3 className="text-lg font-semibold text-gray-800">Campos a Extraer ({documentData.fields.length})</h3>
+          <Divider className="bg-gray-200" />
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {documentData.fields.map((field, index) => (
-              <Card key={field.id} className="bg-gray-50">
-                <CardHeader
-                  className="cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => toggleField(field.id)}
-                >
-                  <div className="flex justify-between items-center w-full">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">
-                        Field {index + 1}: {field.name}
-                      </span>
-                      <Chip size="sm" variant="flat" color="primary">
-                        {field.dataType}
-                      </Chip>
-                    </div>
-                    {expandedFields[field.id] ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </div>
-                </CardHeader>
-
-                {expandedFields[field.id] && (
-                  <CardBody className="pt-0">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Expected Value:</p>
-                        <p className="text-sm">{field.expectedValue}</p>
+              <div key={field.id}>
+                <Card className="bg-green-50/50 border border-green-100">
+                  <div
+                    className="cursor-pointer hover:bg-green-100/50 transition-colors p-6"
+                    onClick={() => toggleField(field.id)}
+                  >
+                    <div className="flex justify-between items-center w-full">
+                      <div className="flex items-center gap-3">
+                        <span className="font-medium text-gray-800">
+                          Campo {index + 1}: {field.name}
+                        </span>
+                        <Chip size="md" variant="flat" className="bg-green-100 text-green-700">
+                          {field.dataType}
+                        </Chip>
                       </div>
-
-                      {field.possibleFormats && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Possible Formats:</p>
-                          <p className="text-sm">{field.possibleFormats}</p>
-                        </div>
-                      )}
-
-                      {field.description && (
-                        <div className="md:col-span-2">
-                          <p className="text-sm font-medium text-gray-600">Description:</p>
-                          <p className="text-sm">{field.description}</p>
-                        </div>
+                      {expandedFields[field.id] ? (
+                        <ChevronUp className="h-5 w-5 text-gray-600" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-gray-600" />
                       )}
                     </div>
-                  </CardBody>
-                )}
-              </Card>
+                  </div>
+
+                  {expandedFields[field.id] && (
+                    <CardBody className="pt-0 p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 mb-1">Valor Esperado:</p>
+                          <p className="text-gray-600">{field.expectedValue}</p>
+                        </div>
+
+                        {field.possibleFormats && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 mb-1">Formatos Posibles:</p>
+                            <p className="text-gray-600">{field.possibleFormats}</p>
+                          </div>
+                        )}
+
+                        {field.description && (
+                          <div className="md:col-span-2">
+                            <p className="text-sm font-medium text-gray-700 mb-1">Descripción:</p>
+                            <p className="text-gray-600">{field.description}</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardBody>
+                  )}
+                </Card>
+              </div>
             ))}
           </div>
         </CardBody>
       </Card>
 
-      <Card className="mb-4">
-        <CardBody>
-          <h3 className="text-md font-medium mb-2">API Configuration</h3>
-          <Divider className="my-2" />
+      <Card className="card-elevated bg-white/80 backdrop-blur-sm">
+        <CardBody className="p-8 space-y-6">
+          <h3 className="text-lg font-semibold text-gray-800">Configuración de API</h3>
+          <Divider className="bg-gray-200" />
           <Input
-            label="API Endpoint"
+            label="Endpoint de API"
             placeholder="https://n8n-api-endpoint.example/webhook"
             value={documentData.apiEndpoint}
             onChange={(e) => onApiEndpointChange(e.target.value)}
-            className="mb-2"
+            size="lg"
+            classNames={{
+              input: "text-base",
+              label: "text-base font-medium text-gray-700",
+              inputWrapper: "input-enhanced h-14",
+            }}
           />
-          <p className="text-xs text-gray-500">
-            Enter the n8n webhook URL where the document and field data will be sent
+          <p className="text-gray-500 font-light">
+            Ingresa la URL del webhook de n8n donde se enviará el documento y los datos de campos
           </p>
         </CardBody>
       </Card>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-900/20 text-red-400 rounded-md border border-red-800">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl flex items-center gap-3">
           <AlertCircle className="h-5 w-5" />
-          <span>{error}</span>
+          <span className="font-medium">{error}</span>
         </div>
       )}
 
-      <div className="flex justify-between mt-4">
-        <Button variant="flat" startContent={<ArrowLeft className="h-4 w-4" />} onClick={onBack}>
-          Back
+      <div className="flex justify-between items-center pt-6">
+        <Button
+          variant="flat"
+          startContent={<ArrowLeft className="h-5 w-5" />}
+          onClick={onBack}
+          size="lg"
+          className="bg-gray-100 text-gray-700 hover:bg-gray-200"
+        >
+          Volver
         </Button>
         <Button
-          color="primary"
-          startContent={<Send className="h-4 w-4" />}
+          color="success"
+          startContent={<Send className="h-5 w-5" />}
           onClick={handleSubmit}
           isLoading={isSubmitting}
+          size="lg"
+          className="btn-primary-gradient text-lg font-medium px-8"
         >
-          Submit to API
+          {isSubmitting ? "Procesando..." : "Enviar a API"}
         </Button>
       </div>
     </div>

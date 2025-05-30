@@ -15,6 +15,7 @@
     "@nextui-org/chip": "latest",
     "@nextui-org/divider": "latest",
     "@nextui-org/input": "latest",
+    "@nextui-org/modal": "latest",
     "@nextui-org/progress": "latest",
     "@nextui-org/react": "latest",
     "@nextui-org/system": "latest",

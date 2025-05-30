@@ -3,7 +3,11 @@ import { NextUIProvider } from "@nextui-org/react"
 import { Inter } from "next/font/google"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+})
 
 export const metadata = {
   title: "Document Reader",
@@ -17,10 +21,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="light">
       <body className={inter.className}>
         <NextUIProvider>
-          <main className="min-h-screen bg-gray-900 dark:bg-gray-900">{children}</main>
+          <main className="min-h-screen bg-gradient-to-br from-green-50 via-white to-gray-100">{children}</main>
         </NextUIProvider>
       </body>
     </html>

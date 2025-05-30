@@ -26,6 +26,9 @@ importers:
       '@nextui-org/input':
         specifier: latest
         version: 2.4.8(@nextui-org/system@2.4.6(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(framer-motion@12.15.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@nextui-org/modal':
+        specifier: latest
+        version: 2.2.7(@nextui-org/system@2.4.6(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(framer-motion@12.15.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(framer-motion@12.15.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@nextui-org/progress':
         specifier: latest
         version: 2.2.6(@nextui-org/system@2.4.6(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(framer-motion@12.15.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -5462,15 +5465,15 @@ snapshots:
 
   '@react-aria/overlays@3.24.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
-      '@react-aria/focus': 3.20.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@react-aria/i18n': 3.12.4(react@19.0.0)
-      '@react-aria/interactions': 3.25.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@react-aria/focus': 3.19.0(react@19.0.0)
+      '@react-aria/i18n': 3.12.9(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@react-aria/interactions': 3.22.5(react@19.0.0)
       '@react-aria/ssr': 3.9.8(react@19.0.0)
       '@react-aria/utils': 3.26.0(react@19.0.0)
       '@react-aria/visually-hidden': 3.8.23(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@react-stately/overlays': 3.6.16(react@19.0.0)
+      '@react-stately/overlays': 3.6.12(react@19.0.0)
       '@react-types/button': 3.12.1(react@19.0.0)
-      '@react-types/overlays': 3.8.15(react@19.0.0)
+      '@react-types/overlays': 3.8.11(react@19.0.0)
       '@react-types/shared': 3.29.1(react@19.0.0)
       '@swc/helpers': 0.5.17
       react: 19.0.0
@@ -5775,8 +5778,8 @@ snapshots:
       '@internationalized/date': 3.6.0
       '@internationalized/string': 3.2.6
       '@react-stately/form': 3.1.4(react@19.0.0)
-      '@react-stately/overlays': 3.6.12(react@19.0.0)
-      '@react-stately/utils': 3.10.5(react@19.0.0)
+      '@react-stately/overlays': 3.6.16(react@19.0.0)
+      '@react-stately/utils': 3.10.6(react@19.0.0)
       '@react-types/datepicker': 3.9.0(react@19.0.0)
       '@react-types/shared': 3.26.0(react@19.0.0)
       '@swc/helpers': 0.5.17
@@ -5913,9 +5916,9 @@ snapshots:
 
   '@react-stately/toggle@3.8.0(react@19.0.0)':
     dependencies:
-      '@react-stately/utils': 3.10.5(react@19.0.0)
+      '@react-stately/utils': 3.10.6(react@19.0.0)
       '@react-types/checkbox': 3.9.4(react@19.0.0)
-      '@react-types/shared': 3.29.1(react@19.0.0)
+      '@react-types/shared': 3.26.0(react@19.0.0)
       '@swc/helpers': 0.5.17
       react: 19.0.0
 
