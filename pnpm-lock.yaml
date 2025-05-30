@@ -5775,8 +5775,8 @@ snapshots:
       '@internationalized/date': 3.6.0
       '@internationalized/string': 3.2.6
       '@react-stately/form': 3.1.4(react@19.0.0)
-      '@react-stately/overlays': 3.6.16(react@19.0.0)
-      '@react-stately/utils': 3.10.6(react@19.0.0)
+      '@react-stately/overlays': 3.6.12(react@19.0.0)
+      '@react-stately/utils': 3.10.5(react@19.0.0)
       '@react-types/datepicker': 3.9.0(react@19.0.0)
       '@react-types/shared': 3.26.0(react@19.0.0)
       '@swc/helpers': 0.5.17
@@ -5913,9 +5913,9 @@ snapshots:
 
   '@react-stately/toggle@3.8.0(react@19.0.0)':
     dependencies:
-      '@react-stately/utils': 3.10.6(react@19.0.0)
+      '@react-stately/utils': 3.10.5(react@19.0.0)
       '@react-types/checkbox': 3.9.4(react@19.0.0)
-      '@react-types/shared': 3.26.0(react@19.0.0)
+      '@react-types/shared': 3.29.1(react@19.0.0)
       '@swc/helpers': 0.5.17
       react: 19.0.0
 

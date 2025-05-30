@@ -85,7 +85,7 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
     <div className="flex flex-col gap-4">
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 cursor-pointer ${
-          dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+          dragActive ? "border-blue-400 bg-blue-900/20" : "border-gray-600 hover:border-gray-500"
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -99,13 +99,15 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
         <p className="text-xs text-gray-500 mt-1">Supports PDF, JPEG, and PNG (max 10MB)</p>
       </div>
 
-      {error && <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">{error}</div>}
+      {error && (
+        <div className="text-red-400 text-sm text-center bg-red-900/20 p-2 rounded border border-red-800">{error}</div>
+      )}
 
       {selectedFile && (
         <Card className="bg-gray-50">
           <CardBody className="flex flex-row items-center justify-between p-4">
             <div className="flex items-center gap-2">
-              <File className="h-5 w-5 text-blue-600" />
+              <File className="h-5 w-5 text-blue-400" />
               <span className="text-sm font-medium">{selectedFile.name}</span>
               <Chip size="sm" variant="flat">
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} MB

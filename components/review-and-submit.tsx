@@ -67,11 +67,11 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center py-8">
-        <div className="rounded-full bg-green-100 p-3 mb-4">
-          <Check className="h-8 w-8 text-green-600" />
+        <div className="rounded-full bg-green-900/20 p-3 mb-4 border border-green-800">
+          <Check className="h-8 w-8 text-green-400" />
         </div>
-        <h2 className="text-xl font-bold mb-2">Submission Successful!</h2>
-        <p className="text-gray-600 text-center mb-6">
+        <h2 className="text-xl font-bold mb-2 text-white">Submission Successful!</h2>
+        <p className="text-gray-300 text-center mb-6">
           Your document and field definitions have been successfully sent to the API.
         </p>
         <Button color="primary" onClick={onReset}>
@@ -172,7 +172,7 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
       </Card>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-md">
+        <div className="flex items-center gap-2 p-3 bg-red-900/20 text-red-400 rounded-md border border-red-800">
           <AlertCircle className="h-5 w-5" />
           <span>{error}</span>
         </div>

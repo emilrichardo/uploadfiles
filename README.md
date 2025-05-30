@@ -32,7 +32,7 @@ A Next.js application for extracting and processing structured data from documen
 
 1. Clone the repository:
 
-```bash
+\`\`\`bash
 git clone https://github.com/yourusername/document-reader.git
 cd document-reader
-```
+\`\`\`
