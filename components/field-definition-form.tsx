@@ -26,7 +26,6 @@ export default function FieldDefinitionForm({ onSubmit, onBack, initialFields = 
         {
           id: "1",
           name: "",
-          expectedValue: "",
           dataType: "text",
           possibleFormats: "",
           description: "",
@@ -41,7 +40,6 @@ export default function FieldDefinitionForm({ onSubmit, onBack, initialFields = 
       {
         id: `${Date.now()}`,
         name: "",
-        expectedValue: "",
         dataType: "text",
         possibleFormats: "",
         description: "",
@@ -55,7 +53,6 @@ export default function FieldDefinitionForm({ onSubmit, onBack, initialFields = 
       // Remove any errors for this field
       const newErrors = { ...errors }
       delete newErrors[`name-${id}`]
-      delete newErrors[`expectedValue-${id}`]
       setErrors(newErrors)
     }
   }
@@ -69,12 +66,6 @@ export default function FieldDefinitionForm({ onSubmit, onBack, initialFields = 
       delete newErrors[`name-${id}`]
       setErrors(newErrors)
     }
-
-    if (updatedField.expectedValue && errors[`expectedValue-${id}`]) {
-      const newErrors = { ...errors }
-      delete newErrors[`expectedValue-${id}`]
-      setErrors(newErrors)
-    }
   }
 
   const validateFields = () => {
@@ -84,11 +75,6 @@ export default function FieldDefinitionForm({ onSubmit, onBack, initialFields = 
     fields.forEach((field) => {
       if (!field.name.trim()) {
         newErrors[`name-${field.id}`] = "El nombre del campo es obligatorio"
-        isValid = false
-      }
-
-      if (!field.expectedValue.trim()) {
-        newErrors[`expectedValue-${field.id}`] = "El valor esperado es obligatorio"
         isValid = false
       }
     })
@@ -121,21 +107,14 @@ export default function FieldDefinitionForm({ onSubmit, onBack, initialFields = 
         </div>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <p className="text-blue-800 font-medium leading-relaxed">
-          💡 <strong>Consejo:</strong> Define cada campo con un nombre descriptivo y un valor esperado. Esto ayudará a
-          la IA a identificar correctamente la información en tu documento.
-        </p>
-      </div>
-
       <div className="space-y-6">
         {fields.map((field, index) => (
           <Card key={field.id} className="card-elevated bg-white/80 backdrop-blur-sm">
             <CardBody className="p-8 space-y-6">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg gradient-green-light p-2">
-                    <Settings className="h-5 w-5 text-green-600" />
+                  <div className="rounded-lg gradient-yellow-light p-2">
+                    <Settings className="h-5 w-5 text-yellow-600" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800">Campo {index + 1}</h3>
                 </div>
@@ -158,7 +137,6 @@ export default function FieldDefinitionForm({ onSubmit, onBack, initialFields = 
                 onChange={(updatedField) => updateField(field.id, updatedField)}
                 errors={{
                   name: errors[`name-${field.id}`],
-                  expectedValue: errors[`expectedValue-${field.id}`],
                 }}
               />
             </CardBody>
@@ -171,7 +149,7 @@ export default function FieldDefinitionForm({ onSubmit, onBack, initialFields = 
         startContent={<Plus className="h-5 w-5" />}
         onClick={addField}
         size="lg"
-        className="bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 font-medium py-6"
+        className="bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100 font-medium py-6"
       >
         Agregar Otro Campo
       </Button>

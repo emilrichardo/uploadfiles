@@ -8,7 +8,6 @@ interface FieldItemProps {
   onChange: (field: Partial<Field>) => void
   errors: {
     name?: string
-    expectedValue?: string
   }
 }
 
@@ -41,28 +40,12 @@ export default function FieldItem({ field, onChange, errors }: FieldItemProps) {
         }}
       />
 
-      <Input
-        label="Valor Esperado"
-        placeholder="ej: INV-2023-001"
-        value={field.expectedValue}
-        onChange={(e) => onChange({ expectedValue: e.target.value })}
-        isRequired
-        isInvalid={!!errors.expectedValue}
-        errorMessage={errors.expectedValue}
-        size="lg"
-        classNames={{
-          input: "text-base",
-          label: "text-base font-medium text-gray-700",
-          inputWrapper: "input-enhanced h-14",
-        }}
-      />
-
       <div className="flex flex-col gap-3">
         <label className="text-base font-medium text-gray-700">Tipo de Dato</label>
         <select
           value={field.dataType}
           onChange={(e) => onChange({ dataType: e.target.value })}
-          className="w-full px-4 py-4 border-2 border-green-200 rounded-xl bg-white/80 text-base focus:outline-none focus:ring-2 focus:ring-green-400/20 focus:border-green-400 transition-all backdrop-blur-sm"
+          className="w-full px-4 py-4 border-2 border-yellow-200 rounded-xl bg-white/80 text-base focus:outline-none focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all backdrop-blur-sm"
         >
           {dataTypes.map((type) => (
             <option key={type.value} value={type.value}>
@@ -87,13 +70,13 @@ export default function FieldItem({ field, onChange, errors }: FieldItemProps) {
         }}
       />
 
-      <div className="md:col-span-2 flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
         <label className="text-base font-medium text-gray-700">Descripción</label>
         <textarea
           placeholder="Descripción breve de este campo y cómo identificarlo"
           value={field.description}
           onChange={(e) => onChange({ description: e.target.value })}
-          className="w-full px-4 py-4 border-2 border-green-200 rounded-xl bg-white/80 text-base focus:outline-none focus:ring-2 focus:ring-green-400/20 focus:border-green-400 transition-all backdrop-blur-sm resize-none"
+          className="w-full px-4 py-4 border-2 border-yellow-200 rounded-xl bg-white/80 text-base focus:outline-none focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all backdrop-blur-sm resize-none"
           rows={4}
         />
       </div>

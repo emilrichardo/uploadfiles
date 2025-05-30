@@ -8,7 +8,7 @@ import { Divider } from "@nextui-org/divider"
 import { Chip } from "@nextui-org/chip"
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal"
 import { ArrowLeft, Send, Check, AlertCircle, File, ChevronDown, ChevronUp, Save, Sparkles } from "lucide-react"
-import { saveTemplate, getCategories } from "@/lib/storage"
+import { saveTemplate } from "@/lib/storage"
 import type { DocumentData } from "@/lib/types"
 
 interface ReviewAndSubmitProps {
@@ -26,8 +26,6 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
   const [showSaveTemplate, setShowSaveTemplate] = useState(false)
   const [templateName, setTemplateName] = useState("")
   const [templateDescription, setTemplateDescription] = useState("")
-
-  const categories = getCategories()
 
   const toggleField = (fieldId: string) => {
     setExpandedFields((prev) => ({
@@ -49,13 +47,15 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
 
       // Add fields as JSON
       formData.append("fields", JSON.stringify(documentData.fields))
-      formData.append("category", documentData.category || "")
+
+      // Use environment variable for API endpoint
+      const apiEndpoint = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://n8n-api-endpoint.example/webhook"
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       // In a real app, you would make an actual API call:
-      // const response = await fetch(documentData.apiEndpoint, {
+      // const response = await fetch(apiEndpoint, {
       //   method: "POST",
       //   body: formData,
       // });
@@ -75,11 +75,8 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
   const handleSaveTemplate = () => {
     if (!templateName.trim()) return
 
-    const categoryName = categories.find((cat) => cat.id === documentData.category)?.name || documentData.category
-
     saveTemplate({
       name: templateName,
-      category: documentData.category || "other",
       fields: documentData.fields,
       description: templateDescription,
     })
@@ -89,20 +86,15 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
     setTemplateDescription("")
   }
 
-  const getCategoryName = () => {
-    const category = categories.find((cat) => cat.id === documentData.category)
-    return category?.name || documentData.category
-  }
-
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-8">
         <div className="relative">
-          <div className="rounded-full gradient-green-light p-6 shadow-xl">
-            <Check className="h-12 w-12 text-green-600" />
+          <div className="rounded-full gradient-yellow-light p-6 shadow-xl">
+            <Check className="h-12 w-12 text-yellow-600" />
           </div>
           <div className="absolute -top-2 -right-2">
-            <Sparkles className="h-8 w-8 text-green-400" />
+            <Sparkles className="h-8 w-8 text-yellow-400" />
           </div>
         </div>
 
@@ -161,11 +153,8 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
                   inputWrapper: "input-enhanced h-14",
                 }}
               />
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
-                <p className="text-green-800 font-medium">
-                  <strong>Categoría:</strong> {getCategoryName()}
-                </p>
-                <p className="text-green-800 font-medium">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 space-y-2">
+                <p className="text-yellow-800 font-medium">
                   <strong>Campos:</strong> {documentData.fields.length}
                 </p>
               </div>
@@ -218,8 +207,8 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
           <h3 className="text-lg font-semibold text-gray-800">Documento</h3>
           <Divider className="bg-gray-200" />
           <div className="flex items-center gap-4">
-            <div className="rounded-xl gradient-green-light p-3">
-              <File className="h-6 w-6 text-green-600" />
+            <div className="rounded-xl gradient-yellow-light p-3">
+              <File className="h-6 w-6 text-yellow-600" />
             </div>
             <div className="space-y-1">
               <span className="font-medium text-gray-800">{documentData.fileName}</span>
@@ -227,11 +216,6 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
                 <Chip size="md" variant="flat" className="bg-gray-100 text-gray-700">
                   {documentData.fileType}
                 </Chip>
-                {documentData.category && (
-                  <Chip size="md" variant="flat" className="bg-green-100 text-green-700">
-                    {getCategoryName()}
-                  </Chip>
-                )}
               </div>
             </div>
           </div>
@@ -246,9 +230,9 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
           <div className="space-y-4">
             {documentData.fields.map((field, index) => (
               <div key={field.id}>
-                <Card className="bg-green-50/50 border border-green-100">
+                <Card className="bg-yellow-50/50 border border-yellow-100">
                   <div
-                    className="cursor-pointer hover:bg-green-100/50 transition-colors p-6"
+                    className="cursor-pointer hover:bg-yellow-100/50 transition-colors p-6"
                     onClick={() => toggleField(field.id)}
                   >
                     <div className="flex justify-between items-center w-full">
@@ -256,7 +240,7 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
                         <span className="font-medium text-gray-800">
                           Campo {index + 1}: {field.name}
                         </span>
-                        <Chip size="md" variant="flat" className="bg-green-100 text-green-700">
+                        <Chip size="md" variant="flat" className="bg-yellow-100 text-yellow-700">
                           {field.dataType}
                         </Chip>
                       </div>
@@ -271,11 +255,6 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
                   {expandedFields[field.id] && (
                     <CardBody className="pt-0 p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700 mb-1">Valor Esperado:</p>
-                          <p className="text-gray-600">{field.expectedValue}</p>
-                        </div>
-
                         {field.possibleFormats && (
                           <div>
                             <p className="text-sm font-medium text-gray-700 mb-1">Formatos Posibles:</p>
@@ -296,28 +275,6 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
               </div>
             ))}
           </div>
-        </CardBody>
-      </Card>
-
-      <Card className="card-elevated bg-white/80 backdrop-blur-sm">
-        <CardBody className="p-8 space-y-6">
-          <h3 className="text-lg font-semibold text-gray-800">Configuración de API</h3>
-          <Divider className="bg-gray-200" />
-          <Input
-            label="Endpoint de API"
-            placeholder="https://n8n-api-endpoint.example/webhook"
-            value={documentData.apiEndpoint}
-            onChange={(e) => onApiEndpointChange(e.target.value)}
-            size="lg"
-            classNames={{
-              input: "text-base",
-              label: "text-base font-medium text-gray-700",
-              inputWrapper: "input-enhanced h-14",
-            }}
-          />
-          <p className="text-gray-500 font-light">
-            Ingresa la URL del webhook de n8n donde se enviará el documento y los datos de campos
-          </p>
         </CardBody>
       </Card>
 

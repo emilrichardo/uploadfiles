@@ -6,21 +6,17 @@ import { Button } from "@nextui-org/button"
 import { Card, CardBody } from "@nextui-org/card"
 import { Chip } from "@nextui-org/chip"
 import { ArrowLeft, FileUp, File, X, Upload } from "lucide-react"
-import { getCategories } from "@/lib/storage"
 
 interface DocumentUploaderProps {
   onUpload: (file: File, category: string) => void
   onBack: () => void
-  selectedCategory?: string
 }
 
-export default function DocumentUploader({ onUpload, onBack, selectedCategory }: DocumentUploaderProps) {
+export default function DocumentUploader({ onUpload, onBack }: DocumentUploaderProps) {
   const [dragActive, setDragActive] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [category, setCategory] = useState(selectedCategory || "")
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
-  const categories = getCategories()
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -76,11 +72,7 @@ export default function DocumentUploader({ onUpload, onBack, selectedCategory }:
       setError("Por favor selecciona un archivo para subir")
       return
     }
-    if (!category) {
-      setError("Por favor selecciona una categoría de documento")
-      return
-    }
-    onUpload(selectedFile, category)
+    onUpload(selectedFile, "")
   }
 
   const removeFile = () => {
@@ -105,39 +97,12 @@ export default function DocumentUploader({ onUpload, onBack, selectedCategory }:
         <h2 className="text-2xl font-semibold text-gray-800">Subir Documento</h2>
       </div>
 
-      {/* Category Selection */}
-      <Card className="card-elevated bg-white/80 backdrop-blur-sm">
-        <CardBody className="p-8 space-y-6">
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-800">Categoría del Documento</h3>
-            <p className="text-gray-600 font-light">Selecciona el tipo de documento que vas a procesar</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((cat) => (
-              <Button
-                key={cat.id}
-                variant={category === cat.id ? "solid" : "flat"}
-                className={`h-auto p-6 flex flex-col items-center gap-3 text-left ${
-                  category === cat.id
-                    ? "btn-primary-gradient"
-                    : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
-                }`}
-                onClick={() => setCategory(cat.id)}
-              >
-                <span className="text-base font-medium">{cat.name}</span>
-                <span className="text-sm opacity-80 text-center leading-relaxed">{cat.description}</span>
-              </Button>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
-
       {/* File Upload */}
       <div
         className={`border-3 border-dashed rounded-2xl p-12 text-center transition-all duration-300 cursor-pointer ${
           dragActive
-            ? "border-green-400 bg-green-50 scale-[1.02]"
-            : "border-gray-300 hover:border-green-300 hover:bg-green-50/50"
+            ? "border-yellow-400 bg-yellow-50 scale-[1.02]"
+            : "border-gray-300 hover:border-yellow-300 hover:bg-yellow-50/50"
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -147,8 +112,8 @@ export default function DocumentUploader({ onUpload, onBack, selectedCategory }:
       >
         <input ref={inputRef} type="file" className="hidden" onChange={handleChange} accept=".pdf,.jpg,.jpeg,.png" />
         <div className="space-y-6">
-          <div className="rounded-2xl gradient-green-light p-6 w-fit mx-auto shadow-lg">
-            <FileUp className="h-12 w-12 text-green-600 mx-auto" />
+          <div className="rounded-2xl gradient-yellow-light p-6 w-fit mx-auto shadow-lg">
+            <FileUp className="h-12 w-12 text-yellow-600 mx-auto" />
           </div>
           <div className="space-y-3">
             <p className="text-lg font-medium text-gray-700">
@@ -169,13 +134,13 @@ export default function DocumentUploader({ onUpload, onBack, selectedCategory }:
         <Card className="card-elevated bg-white/90 backdrop-blur-sm">
           <CardBody className="flex flex-row items-center justify-between p-6">
             <div className="flex items-center gap-4">
-              <div className="rounded-xl gradient-green-light p-3">
-                <File className="h-6 w-6 text-green-600" />
+              <div className="rounded-xl gradient-yellow-light p-3">
+                <File className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="space-y-1">
                 <span className="text-base font-medium text-gray-800">{selectedFile.name}</span>
                 <div className="flex items-center gap-3">
-                  <Chip size="md" variant="flat" className="bg-green-100 text-green-700">
+                  <Chip size="md" variant="flat" className="bg-yellow-100 text-yellow-700">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                   </Chip>
                   <span className="text-sm text-gray-500">{selectedFile.type}</span>
@@ -203,7 +168,7 @@ export default function DocumentUploader({ onUpload, onBack, selectedCategory }:
         size="lg"
         className="btn-primary-gradient text-lg font-medium py-6"
         onClick={handleSubmit}
-        isDisabled={!selectedFile || !category}
+        isDisabled={!selectedFile}
         startContent={<Upload className="h-5 w-5" />}
       >
         Continuar con la Configuración
