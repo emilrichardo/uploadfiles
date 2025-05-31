@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 * {
-  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
 }
 
 body {
-  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
   font-weight: 400;
   line-height: 1.6;
 }
@@ -26,8 +26,8 @@ body {
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 54 96% 80%;
-    --primary-foreground: 240 10% 3.9%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 355 100% 97%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
@@ -38,8 +38,8 @@ body {
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 54 96% 80%;
-    --chart-1: 54 96% 80%;
+    --ring: 142 76% 36%;
+    --chart-1: 142 76% 36%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
@@ -57,17 +57,17 @@ body {
   }
 }
 
-/* Custom yellow theme */
-.gradient-yellow {
-  background: linear-gradient(135deg, #fffd98 0%, #fff59d 50%, #fff176 100%);
+/* Custom green theme */
+.gradient-green {
+  background: linear-gradient(135deg, #86efac 0%, #bbf7d0 50%, #dcfce7 100%);
 }
 
-.gradient-yellow-light {
-  background: linear-gradient(135deg, #fffef7 0%, #fffde7 50%, #fff9c4 100%);
+.gradient-green-light {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
 }
 
-.gradient-yellow-subtle {
-  background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+.gradient-green-subtle {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
 }
 
 /* Enhanced spacing utilities */
@@ -85,21 +85,21 @@ body {
 
 /* Card enhancements */
 .card-elevated {
-  @apply shadow-lg shadow-yellow-100/50 border border-yellow-100/50;
+  @apply shadow-lg shadow-green-100/50 border border-green-100/50;
   backdrop-filter: blur(10px);
 }
 
 .card-hover {
-  @apply hover:shadow-xl hover:shadow-yellow-200/30 hover:scale-105 transition-all duration-300;
+  @apply hover:shadow-xl hover:shadow-green-200/30 hover:scale-105 transition-all duration-300;
 }
 
 /* Button enhancements */
 .btn-primary-gradient {
-  background: linear-gradient(135deg, #fffd98 0%, #fff59d 50%, #f59e0b 100%);
-  @apply text-gray-800 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/40 transition-all duration-300;
+  background: linear-gradient(135deg, #86efac 0%, #4ade80 50%, #22c55e 100%);
+  @apply text-white shadow-lg shadow-green-500/25 hover:shadow-xl hover:shadow-green-500/40 transition-all duration-300;
 }
 
 /* Input enhancements */
 .input-enhanced {
-  @apply border-yellow-200 focus:border-yellow-400 focus:ring-yellow-400/20 bg-white/80 backdrop-blur-sm;
+  @apply border-green-200 focus:border-green-400 focus:ring-green-400/20 bg-white/80 backdrop-blur-sm;
 }

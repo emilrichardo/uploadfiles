@@ -12,12 +12,33 @@ export interface DocumentData {
   fileType: string
   fields: Field[]
   apiEndpoint: string
+  extractedData?: Record<string, any>
 }
 
-export interface DocumentTemplate {
+export interface FieldTemplate {
   id: string
   name: string
   fields: Field[]
   createdAt: string
   description?: string
+  projectId: string
+}
+
+export interface Project {
+  id: string
+  name: string
+  description: string
+  createdAt: string
+  documentsCount: number
+}
+
+export interface ProcessedDocument {
+  id: string
+  projectId: string
+  fileName: string
+  fileType: string
+  fields: Field[]
+  extractedData: Record<string, any>
+  processedAt: string
+  templateId?: string
 }

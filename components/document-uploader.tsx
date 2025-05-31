@@ -101,8 +101,8 @@ export default function DocumentUploader({ onUpload, onBack }: DocumentUploaderP
       <div
         className={`border-3 border-dashed rounded-2xl p-12 text-center transition-all duration-300 cursor-pointer ${
           dragActive
-            ? "border-yellow-400 bg-yellow-50 scale-[1.02]"
-            : "border-gray-300 hover:border-yellow-300 hover:bg-yellow-50/50"
+            ? "border-green-400 bg-green-50 scale-[1.02]"
+            : "border-gray-300 hover:border-green-300 hover:bg-green-50/50"
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -112,8 +112,8 @@ export default function DocumentUploader({ onUpload, onBack }: DocumentUploaderP
       >
         <input ref={inputRef} type="file" className="hidden" onChange={handleChange} accept=".pdf,.jpg,.jpeg,.png" />
         <div className="space-y-6">
-          <div className="rounded-2xl gradient-yellow-light p-6 w-fit mx-auto shadow-lg">
-            <FileUp className="h-12 w-12 text-yellow-600 mx-auto" />
+          <div className="rounded-2xl gradient-green-light p-6 w-fit mx-auto shadow-lg">
+            <FileUp className="h-12 w-12 text-green-600 mx-auto" />
           </div>
           <div className="space-y-3">
             <p className="text-lg font-medium text-gray-700">
@@ -134,13 +134,13 @@ export default function DocumentUploader({ onUpload, onBack }: DocumentUploaderP
         <Card className="card-elevated bg-white/90 backdrop-blur-sm">
           <CardBody className="flex flex-row items-center justify-between p-6">
             <div className="flex items-center gap-4">
-              <div className="rounded-xl gradient-yellow-light p-3">
-                <File className="h-6 w-6 text-yellow-600" />
+              <div className="rounded-xl gradient-green-light p-3">
+                <File className="h-6 w-6 text-green-600" />
               </div>
               <div className="space-y-1">
                 <span className="text-base font-medium text-gray-800">{selectedFile.name}</span>
                 <div className="flex items-center gap-3">
-                  <Chip size="md" variant="flat" className="bg-yellow-100 text-yellow-700">
+                  <Chip size="md" variant="flat" className="bg-green-100 text-green-700">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                   </Chip>
                   <span className="text-sm text-gray-500">{selectedFile.type}</span>

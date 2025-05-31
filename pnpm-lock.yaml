@@ -23,6 +23,9 @@ importers:
       '@nextui-org/divider':
         specifier: latest
         version: 2.2.5(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@nextui-org/dropdown':
+        specifier: latest
+        version: 2.3.9(@nextui-org/system@2.4.6(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(framer-motion@12.15.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(framer-motion@12.15.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@nextui-org/input':
         specifier: latest
         version: 2.4.8(@nextui-org/system@2.4.6(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(framer-motion@12.15.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@nextui-org/theme@2.4.5(tailwindcss@3.4.17))(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -5429,17 +5432,17 @@ snapshots:
     dependencies:
       '@react-aria/focus': 3.19.0(react@19.0.0)
       '@react-aria/i18n': 3.12.9(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@react-aria/interactions': 3.22.5(react@19.0.0)
+      '@react-aria/interactions': 3.25.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@react-aria/overlays': 3.27.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@react-aria/selection': 3.24.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@react-aria/utils': 3.26.0(react@19.0.0)
       '@react-stately/collections': 3.12.4(react@19.0.0)
       '@react-stately/menu': 3.9.0(react@19.0.0)
       '@react-stately/selection': 3.20.2(react@19.0.0)
-      '@react-stately/tree': 3.8.6(react@19.0.0)
+      '@react-stately/tree': 3.8.10(react@19.0.0)
       '@react-types/button': 3.12.1(react@19.0.0)
       '@react-types/menu': 3.9.13(react@19.0.0)
-      '@react-types/shared': 3.26.0(react@19.0.0)
+      '@react-types/shared': 3.29.1(react@19.0.0)
       '@swc/helpers': 0.5.17
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
@@ -5832,7 +5835,7 @@ snapshots:
     dependencies:
       '@react-stately/overlays': 3.6.16(react@19.0.0)
       '@react-types/menu': 3.9.13(react@19.0.0)
-      '@react-types/shared': 3.26.0(react@19.0.0)
+      '@react-types/shared': 3.29.1(react@19.0.0)
       '@swc/helpers': 0.5.17
       react: 19.0.0
 
@@ -6073,7 +6076,7 @@ snapshots:
   '@react-types/menu@3.9.13(react@19.0.0)':
     dependencies:
       '@react-types/overlays': 3.8.15(react@19.0.0)
-      '@react-types/shared': 3.26.0(react@19.0.0)
+      '@react-types/shared': 3.29.1(react@19.0.0)
       react: 19.0.0
 
   '@react-types/overlays@3.8.11(react@19.0.0)':

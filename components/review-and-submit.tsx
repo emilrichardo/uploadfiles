@@ -3,29 +3,39 @@
 import { useState } from "react"
 import { Button } from "@nextui-org/button"
 import { Card, CardBody } from "@nextui-org/card"
-import { Input } from "@nextui-org/input"
 import { Divider } from "@nextui-org/divider"
 import { Chip } from "@nextui-org/chip"
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal"
-import { ArrowLeft, Send, Check, AlertCircle, File, ChevronDown, ChevronUp, Save, Sparkles } from "lucide-react"
-import { saveTemplate } from "@/lib/storage"
-import type { DocumentData } from "@/lib/types"
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/dropdown"
+import { ArrowLeft, Send, Check, AlertCircle, File, ChevronDown, ChevronUp, Sparkles, Download } from "lucide-react"
+import { saveProcessedDocument, generateExtractedDataFile, getProjects, getProjectById } from "@/lib/storage"
+import type { DocumentData, Project } from "@/lib/types"
 
 interface ReviewAndSubmitProps {
   documentData: DocumentData
   onBack: () => void
-  onApiEndpointChange: (endpoint: string) => void
   onReset: () => void
+  currentProjectId: string
+  templateId?: string
 }
 
-export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointChange, onReset }: ReviewAndSubmitProps) {
+export default function ReviewAndSubmit({
+  documentData,
+  onBack,
+  onReset,
+  currentProjectId,
+  templateId,
+}: ReviewAndSubmitProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState("")
   const [expandedFields, setExpandedFields] = useState<Record<string, boolean>>({})
-  const [showSaveTemplate, setShowSaveTemplate] = useState(false)
-  const [templateName, setTemplateName] = useState("")
-  const [templateDescription, setTemplateDescription] = useState("")
+  const [processedDocument, setProcessedDocument] = useState<any>(null)
+  const [selectedProjectId, setSelectedProjectId] = useState(currentProjectId)
+  const [projects, setProjects] = useState<Project[]>([])
+
+  useState(() => {
+    setProjects(getProjects())
+  })
 
   const toggleField = (fieldId: string) => {
     setExpandedFields((prev) => ({
@@ -51,19 +61,38 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
       // Use environment variable for API endpoint
       const apiEndpoint = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://n8n-api-endpoint.example/webhook"
 
-      // Simulate API call
+      // Simulate API call and response with extracted data
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      // In a real app, you would make an actual API call:
-      // const response = await fetch(apiEndpoint, {
-      //   method: "POST",
-      //   body: formData,
-      // });
-      //
-      // if (!response.ok) {
-      //   throw new Error(`Error: ${response.status}`);
-      // }
+      // Simulate extracted data response
+      const mockExtractedData: Record<string, any> = {}
+      documentData.fields.forEach((field) => {
+        // Generate mock data based on field type
+        switch (field.dataType) {
+          case "text":
+            mockExtractedData[field.name] = `Valor extraído para ${field.name}`
+            break
+          case "number":
+            mockExtractedData[field.name] = Math.floor(Math.random() * 1000)
+            break
+          case "date":
+            mockExtractedData[field.name] = new Date().toISOString().split("T")[0]
+            break
+          case "email":
+            mockExtractedData[field.name] = "ejemplo@email.com"
+            break
+          case "phone":
+            mockExtractedData[field.name] = "+1234567890"
+            break
+          default:
+            mockExtractedData[field.name] = `Valor de ${field.name}`
+        }
+      })
 
+      setProcessedDocument({
+        ...documentData,
+        extractedData: mockExtractedData,
+      })
       setIsSuccess(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred")
@@ -72,114 +101,118 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
     }
   }
 
-  const handleSaveTemplate = () => {
-    if (!templateName.trim()) return
+  const handleSaveDocument = () => {
+    if (processedDocument && typeof window !== "undefined") {
+      const savedDoc = saveProcessedDocument({
+        projectId: selectedProjectId,
+        fileName: processedDocument.fileName,
+        fileType: processedDocument.fileType,
+        fields: processedDocument.fields,
+        extractedData: processedDocument.extractedData,
+        templateId,
+      })
 
-    saveTemplate({
-      name: templateName,
-      fields: documentData.fields,
-      description: templateDescription,
-    })
-
-    setShowSaveTemplate(false)
-    setTemplateName("")
-    setTemplateDescription("")
+      // Generate and download the extracted data file
+      generateExtractedDataFile(savedDoc)
+    }
   }
+
+  const selectedProject = getProjectById(selectedProjectId)
 
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-8">
         <div className="relative">
-          <div className="rounded-full gradient-yellow-light p-6 shadow-xl">
-            <Check className="h-12 w-12 text-yellow-600" />
+          <div className="rounded-full gradient-green-light p-6 shadow-xl">
+            <Check className="h-12 w-12 text-green-600" />
           </div>
           <div className="absolute -top-2 -right-2">
-            <Sparkles className="h-8 w-8 text-yellow-400" />
+            <Sparkles className="h-8 w-8 text-green-400" />
           </div>
         </div>
 
         <div className="text-center space-y-4">
           <h2 className="text-3xl font-bold text-gray-800">¡Procesamiento Exitoso!</h2>
           <p className="text-gray-600 text-lg font-light max-w-lg mx-auto leading-relaxed">
-            Tu documento y configuración de campos han sido enviados exitosamente a la API.
+            Tu documento ha sido procesado y los campos han sido extraídos exitosamente.
           </p>
         </div>
 
-        <div className="flex gap-4">
+        {/* Extracted Data Preview */}
+        {processedDocument && (
+          <Card className="card-elevated bg-white/80 backdrop-blur-sm max-w-2xl w-full">
+            <CardBody className="p-6 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">Datos Extraídos</h3>
+              <Divider className="bg-gray-200" />
+              <div className="space-y-3">
+                {Object.entries(processedDocument.extractedData).map(([key, value]) => (
+                  <div key={key} className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="font-medium text-gray-700">{key}:</span>
+                    <span className="text-gray-600">{String(value)}</span>
+                  </div>
+                ))}
+              </div>
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Project Selection */}
+        <Card className="card-elevated bg-white/80 backdrop-blur-sm max-w-2xl w-full">
+          <CardBody className="p-6 space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">Guardar en Proyecto</h3>
+            <Divider className="bg-gray-200" />
+            <div className="flex items-center gap-4">
+              <span className="text-gray-600 font-medium">Proyecto:</span>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button
+                    variant="flat"
+                    className="bg-green-50 border border-green-200 hover:bg-green-100 min-w-64 justify-between"
+                    endContent={<ChevronDown className="h-4 w-4" />}
+                  >
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold text-gray-800">{selectedProject?.name}</span>
+                      {selectedProject?.description && (
+                        <span className="text-xs text-gray-500 truncate max-w-48">{selectedProject.description}</span>
+                      )}
+                    </div>
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Proyectos" className="min-w-64">
+                  {projects.map((project) => (
+                    <DropdownItem
+                      key={project.id}
+                      onClick={() => setSelectedProjectId(project.id)}
+                      className={selectedProjectId === project.id ? "bg-green-50" : ""}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">{project.name}</span>
+                        {project.description && <span className="text-xs text-gray-500">{project.description}</span>}
+                        <span className="text-xs text-gray-400">{project.documentsCount} documentos</span>
+                      </div>
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+            </div>
+          </CardBody>
+        </Card>
+
+        <div className="flex gap-4 flex-wrap justify-center">
           <Button
-            color="secondary"
-            variant="flat"
-            startContent={<Save className="h-5 w-5" />}
-            onClick={() => setShowSaveTemplate(true)}
+            color="primary"
+            startContent={<Download className="h-5 w-5" />}
+            onClick={handleSaveDocument}
             size="lg"
-            className="bg-gray-100 text-gray-700 hover:bg-gray-200 font-medium px-6"
+            className="btn-primary-gradient font-medium px-6"
           >
-            Guardar como Plantilla
+            Guardar Documento
           </Button>
+
           <Button color="success" onClick={onReset} size="lg" className="btn-primary-gradient font-medium px-8">
             Procesar Otro Documento
           </Button>
         </div>
-
-        {/* Save Template Modal */}
-        <Modal isOpen={showSaveTemplate} onClose={() => setShowSaveTemplate(false)} size="lg">
-          <ModalContent className="m-6">
-            <ModalHeader className="p-6 pb-2">
-              <h3 className="text-xl font-semibold text-gray-800">Guardar Plantilla</h3>
-            </ModalHeader>
-            <ModalBody className="p-6 space-y-6">
-              <Input
-                label="Nombre de la Plantilla"
-                placeholder="ej: Facturas de Servicios"
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                isRequired
-                size="lg"
-                classNames={{
-                  input: "text-base",
-                  label: "text-base font-medium text-gray-700",
-                  inputWrapper: "input-enhanced h-14",
-                }}
-              />
-              <Input
-                label="Descripción (opcional)"
-                placeholder="Describe para qué tipo de documentos es esta plantilla"
-                value={templateDescription}
-                onChange={(e) => setTemplateDescription(e.target.value)}
-                size="lg"
-                classNames={{
-                  input: "text-base",
-                  label: "text-base font-medium text-gray-700",
-                  inputWrapper: "input-enhanced h-14",
-                }}
-              />
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 space-y-2">
-                <p className="text-yellow-800 font-medium">
-                  <strong>Campos:</strong> {documentData.fields.length}
-                </p>
-              </div>
-            </ModalBody>
-            <ModalFooter className="p-6 pt-2">
-              <Button
-                variant="flat"
-                onClick={() => setShowSaveTemplate(false)}
-                size="lg"
-                className="bg-gray-100 text-gray-700 hover:bg-gray-200"
-              >
-                Cancelar
-              </Button>
-              <Button
-                color="primary"
-                onClick={handleSaveTemplate}
-                isDisabled={!templateName.trim()}
-                size="lg"
-                className="btn-primary-gradient font-medium"
-              >
-                Guardar Plantilla
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
       </div>
     )
   }
@@ -197,7 +230,7 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
           Volver
         </Button>
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold text-gray-800">Revisar y Enviar</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Revisar y Procesar</h2>
           <p className="text-gray-600 font-light">Verifica la información antes de procesar</p>
         </div>
       </div>
@@ -207,8 +240,8 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
           <h3 className="text-lg font-semibold text-gray-800">Documento</h3>
           <Divider className="bg-gray-200" />
           <div className="flex items-center gap-4">
-            <div className="rounded-xl gradient-yellow-light p-3">
-              <File className="h-6 w-6 text-yellow-600" />
+            <div className="rounded-xl gradient-green-light p-3">
+              <File className="h-6 w-6 text-green-600" />
             </div>
             <div className="space-y-1">
               <span className="font-medium text-gray-800">{documentData.fileName}</span>
@@ -230,9 +263,9 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
           <div className="space-y-4">
             {documentData.fields.map((field, index) => (
               <div key={field.id}>
-                <Card className="bg-yellow-50/50 border border-yellow-100">
+                <Card className="bg-green-50/50 border border-green-100">
                   <div
-                    className="cursor-pointer hover:bg-yellow-100/50 transition-colors p-6"
+                    className="cursor-pointer hover:bg-green-100/50 transition-colors p-6"
                     onClick={() => toggleField(field.id)}
                   >
                     <div className="flex justify-between items-center w-full">
@@ -240,7 +273,7 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
                         <span className="font-medium text-gray-800">
                           Campo {index + 1}: {field.name}
                         </span>
-                        <Chip size="md" variant="flat" className="bg-yellow-100 text-yellow-700">
+                        <Chip size="md" variant="flat" className="bg-green-100 text-green-700">
                           {field.dataType}
                         </Chip>
                       </div>
@@ -303,7 +336,7 @@ export default function ReviewAndSubmit({ documentData, onBack, onApiEndpointCha
           size="lg"
           className="btn-primary-gradient text-lg font-medium px-8"
         >
-          {isSubmitting ? "Procesando..." : "Enviar a API"}
+          {isSubmitting ? "Procesando..." : "Procesar Documento"}
         </Button>
       </div>
     </div>

@@ -45,7 +45,7 @@ export default function FieldItem({ field, onChange, errors }: FieldItemProps) {
         <select
           value={field.dataType}
           onChange={(e) => onChange({ dataType: e.target.value })}
-          className="w-full px-4 py-4 border-2 border-yellow-200 rounded-xl bg-white/80 text-base focus:outline-none focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all backdrop-blur-sm"
+          className="w-full px-4 py-4 border-2 border-green-200 rounded-xl bg-white/80 text-base focus:outline-none focus:ring-2 focus:ring-green-400/20 focus:border-green-400 transition-all backdrop-blur-sm"
         >
           {dataTypes.map((type) => (
             <option key={type.value} value={type.value}>
@@ -76,7 +76,7 @@ export default function FieldItem({ field, onChange, errors }: FieldItemProps) {
           placeholder="Descripción breve de este campo y cómo identificarlo"
           value={field.description}
           onChange={(e) => onChange({ description: e.target.value })}
-          className="w-full px-4 py-4 border-2 border-yellow-200 rounded-xl bg-white/80 text-base focus:outline-none focus:ring-2 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all backdrop-blur-sm resize-none"
+          className="w-full px-4 py-4 border-2 border-green-200 rounded-xl bg-white/80 text-base focus:outline-none focus:ring-2 focus:ring-green-400/20 focus:border-green-400 transition-all backdrop-blur-sm resize-none"
           rows={4}
         />
       </div>

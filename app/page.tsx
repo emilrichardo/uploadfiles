@@ -1,16 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardBody, CardHeader } from "@nextui-org/card"
 import { Progress } from "@nextui-org/progress"
 import DocumentUploader from "@/components/document-uploader"
 import FieldDefinitionForm from "@/components/field-definition-form"
 import ReviewAndSubmit from "@/components/review-and-submit"
-import DocumentTypeSelector from "@/components/document-type-selector"
-import type { DocumentData } from "@/lib/types"
+import TemplateSelector from "@/components/template-selector"
+import ProjectHeader from "@/components/project-header"
+import { initializeDefaultProject } from "@/lib/storage"
+import type { DocumentData, FieldTemplate } from "@/lib/types"
 
 export default function Home() {
-  const [step, setStep] = useState(0) // 0: type selection, 1: upload, 2: fields, 3: review
+  const [step, setStep] = useState(1) // 1: upload, 2: template selection, 3: fields, 4: review
+  const [currentProjectId, setCurrentProjectId] = useState("")
+  const [selectedTemplate, setSelectedTemplate] = useState<FieldTemplate | null>(null)
   const [documentData, setDocumentData] = useState<DocumentData>({
     file: null,
     fileName: "",
@@ -19,16 +23,14 @@ export default function Home() {
     apiEndpoint: process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://n8n-api-endpoint.example/webhook",
   })
 
-  const handleTypeSelection = (type: "new" | "template", templateData?: any) => {
-    if (type === "template" && templateData) {
-      setDocumentData({
-        ...documentData,
-        fields: templateData.fields,
-      })
-      setStep(1)
-    } else {
-      setStep(1)
-    }
+  useEffect(() => {
+    // Initialize with default project if none exists
+    const defaultProject = initializeDefaultProject()
+    setCurrentProjectId(defaultProject.id)
+  }, [])
+
+  const handleProjectChange = (projectId: string) => {
+    setCurrentProjectId(projectId)
   }
 
   const handleDocumentUpload = (file: File) => {
@@ -41,19 +43,23 @@ export default function Home() {
     setStep(2)
   }
 
-  const handleFieldsUpdate = (fields: any[]) => {
+  const handleTemplateSelect = (template: FieldTemplate | null) => {
+    setSelectedTemplate(template)
+    if (template) {
+      setDocumentData({
+        ...documentData,
+        fields: template.fields,
+      })
+    }
+    setStep(3)
+  }
+
+  const handleFieldsUpdate = (fields: any[], templateId?: string) => {
     setDocumentData({
       ...documentData,
       fields,
     })
-    setStep(3)
-  }
-
-  const handleApiEndpointUpdate = (endpoint: string) => {
-    setDocumentData({
-      ...documentData,
-      apiEndpoint: endpoint,
-    })
+    setStep(4)
   }
 
   const handleReset = () => {
@@ -64,15 +70,19 @@ export default function Home() {
       fields: [],
       apiEndpoint: process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://n8n-api-endpoint.example/webhook",
     })
-    setStep(0)
+    setSelectedTemplate(null)
+    setStep(1)
   }
 
   return (
     <div className="container mx-auto px-8 py-12">
       <Card className="max-w-5xl mx-auto card-elevated bg-white/70 backdrop-blur-sm">
-        <CardHeader className="flex flex-col gap-6 p-10">
+        {/* Project Header */}
+        <ProjectHeader selectedProjectId={currentProjectId} onProjectChange={handleProjectChange} />
+
+        <CardHeader className="flex flex-col gap-6 p-10 pt-6">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
               Document Reader
             </h1>
             <p className="text-gray-600 text-lg font-light">
@@ -80,57 +90,66 @@ export default function Home() {
             </p>
           </div>
 
-          {step > 0 && (
+          {step > 1 && (
             <div className="space-y-6">
               <Progress
                 aria-label="Progress"
-                value={(step / 3) * 100}
+                value={((step - 1) / 3) * 100}
                 className="max-w-lg mx-auto"
-                color="warning"
+                color="success"
                 size="lg"
                 classNames={{
-                  track: "bg-yellow-100",
-                  indicator: "gradient-yellow",
+                  track: "bg-green-100",
+                  indicator: "gradient-green",
                 }}
               />
               <div className="flex justify-between w-full max-w-lg mx-auto text-sm font-medium">
-                <span className={`transition-colors ${step >= 1 ? "text-yellow-600" : "text-gray-400"}`}>
-                  Subir Documento
+                <span className={`transition-colors ${step >= 2 ? "text-green-600" : "text-gray-400"}`}>
+                  Seleccionar Plantilla
                 </span>
-                <span className={`transition-colors ${step >= 2 ? "text-yellow-600" : "text-gray-400"}`}>
+                <span className={`transition-colors ${step >= 3 ? "text-green-600" : "text-gray-400"}`}>
                   Definir Campos
                 </span>
-                <span className={`transition-colors ${step >= 3 ? "text-yellow-600" : "text-gray-400"}`}>
-                  Revisar y Enviar
+                <span className={`transition-colors ${step >= 4 ? "text-green-600" : "text-gray-400"}`}>
+                  Revisar y Procesar
                 </span>
               </div>
             </div>
           )}
 
-          {step === 0 && (
+          {step === 1 && (
             <div className="text-center space-y-2">
-              <p className="text-gray-500 text-lg">Elige cómo quieres procesar tu documento</p>
-              <div className="w-24 h-1 gradient-yellow mx-auto rounded-full"></div>
+              <p className="text-gray-500 text-lg">Sube tu documento para comenzar</p>
+              <div className="w-24 h-1 gradient-green mx-auto rounded-full"></div>
             </div>
           )}
         </CardHeader>
 
         <CardBody className="p-10 pt-0">
-          {step === 0 && <DocumentTypeSelector onSelect={handleTypeSelection} />}
-          {step === 1 && <DocumentUploader onUpload={handleDocumentUpload} onBack={() => setStep(0)} />}
+          {step === 1 && <DocumentUploader onUpload={handleDocumentUpload} onBack={() => {}} />}
           {step === 2 && (
-            <FieldDefinitionForm
-              onSubmit={handleFieldsUpdate}
+            <TemplateSelector
+              projectId={currentProjectId}
+              onSelectTemplate={handleTemplateSelect}
               onBack={() => setStep(1)}
-              initialFields={documentData.fields}
             />
           )}
           {step === 3 && (
+            <FieldDefinitionForm
+              onSubmit={handleFieldsUpdate}
+              onBack={() => setStep(2)}
+              initialFields={documentData.fields}
+              projectId={currentProjectId}
+              selectedTemplate={selectedTemplate}
+            />
+          )}
+          {step === 4 && (
             <ReviewAndSubmit
               documentData={documentData}
-              onBack={() => setStep(2)}
-              onApiEndpointChange={handleApiEndpointUpdate}
+              onBack={() => setStep(3)}
               onReset={handleReset}
+              currentProjectId={currentProjectId}
+              templateId={selectedTemplate?.id}
             />
           )}
         </CardBody>
